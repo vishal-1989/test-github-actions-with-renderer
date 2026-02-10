@@ -29,6 +29,7 @@ jobs:
       - name: Build Image
         run: |
           docker build \
+            --build-arg DEPLOYMENT_GUID=${{ env.DEPLOYMENT_GUID }} \
             -f app/Dockerfile \
             -t ${{ secrets.DOCKERHUB_USERNAME }}/test-github-actions-with-renderer:${{ env.DEPLOYMENT_GUID }} \
             -t ${{ secrets.DOCKERHUB_USERNAME }}/test-github-actions-with-renderer:latest \

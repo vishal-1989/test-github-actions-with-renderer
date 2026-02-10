@@ -8,7 +8,8 @@ RUN npm install --production
 COPY . .
 
 # Default value (will be overridden by CI/CD)
-ENV DEPLOYMENT_GUID=unknown
+ARG DEPLOYMENT_GUID
+ENV DEPLOYMENT_GUID=${DEPLOYMENT_GUID}
 
 EXPOSE 3000
 
