@@ -1,0 +1,40 @@
+name: CI with docker
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️⃣ Checkout code
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 2️⃣ Generate Deployment GUID
+      - name: Generate GUID
+        run: echo "DEPLOYMENT_GUID=${{ github.run_number }}-${{ github.sha }}" >> $GITHUB_ENV
+
+      # 3️⃣ Login to Docker Hub
+      - name: Docker Login
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # 4️⃣ Build Docker Image
+      - name: Build Image
+        run: |
+          docker build \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/test-github-actions-with-renderer:${{ env.DEPLOYMENT_GUID }} \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/test-github-actions-with-renderer:latest \
+            .
+
+      # 5️⃣ Push Docker Image
+      - name: Push Image
+        run: |
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/test-github-actions-with-renderer:${{ env.DEPLOYMENT_GUID }}
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/test-github-actions-with-renderer:latest
