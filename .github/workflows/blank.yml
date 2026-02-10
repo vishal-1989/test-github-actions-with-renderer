@@ -32,7 +32,7 @@ jobs:
             -f app/Dockerfile \
             -t ${{ secrets.DOCKERHUB_USERNAME }}/test-github-actions-with-renderer:${{ env.DEPLOYMENT_GUID }} \
             -t ${{ secrets.DOCKERHUB_USERNAME }}/test-github-actions-with-renderer:latest \
-            .
+            app
 
       # 5️⃣ Push Docker Image
       - name: Push Image
