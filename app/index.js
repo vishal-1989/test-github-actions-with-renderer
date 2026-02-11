@@ -11,7 +11,7 @@ const DEPLOYMENT_GUID = process.env.DEPLOYMENT_GUID || "not-set";
 app.get("/", (req, res) => {
   res.json({
     status: "OK",
-    message: "Node.js app is running with added deployment with args",
+    message: "Node.js app is running with added deployment with args New deployment",
     deploymentGuid: DEPLOYMENT_GUID,
     timestamp: new Date().toISOString()
   });
