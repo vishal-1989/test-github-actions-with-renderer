@@ -114,7 +114,7 @@ jobs:
           railway up \
             --service ${{ secrets.RAILWAY_SERVICE_ID_STAGING }} \
             --environment staging \
-            --image ${{ secrets.DOCKERHUB_USERNAME }}/test-github-actions-with-renderer:${{ needs.docker-build-push.outputs.deployment_guid }}
+            --message "Deploy ${{ needs.docker-build-push.outputs.deployment_guid }}"
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN_STAGING }}
           RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
@@ -134,7 +134,7 @@ jobs:
           railway up \
             --service ${{ secrets.RAILWAY_SERVICE_ID_PRODUCTION }} \
             --environment production \
-            --image ${{ secrets.DOCKERHUB_USERNAME }}/test-github-actions-with-renderer:${{ needs.deploy-staging.outputs.deployment_guid }}
+            --message "Deploy ${{ needs.deploy-staging.outputs.deployment_guid }}"
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN_PRODUCTION }}
           RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
