@@ -9,7 +9,7 @@ jobs:
   docker-build-push:
     runs-on: ubuntu-latest
     outputs:
-      deployment_guid: ${{ steps.guid.outputs.DEPLOYMENT_GUID }}
+      deployment_guid: ${{ steps.guid.outputs.deployment_guid }}
 
     steps:
       # 1️⃣ Checkout code
@@ -19,7 +19,7 @@ jobs:
       # 2️⃣ Generate Deployment GUID
       - name: Generate GUID
         id: guid
-        run: echo "DEPLOYMENT_GUID=${{ github.run_number }}-${{ github.sha }}" >> $GITHUB_ENV
+        run: echo "deployment_guid=${{ github.run_number }}-${{ github.sha }}" >> $GITHUB_OUTPUT
 
       # 3️⃣ Login to Docker Hub
       - name: Docker Login
@@ -32,16 +32,16 @@ jobs:
       - name: Build Image
         run: |
           docker build \
-            --build-arg DEPLOYMENT_GUID=${{ env.DEPLOYMENT_GUID }} \
+            --build-arg DEPLOYMENT_GUID=${{ steps.guid.outputs.deployment_guid }} \
             -f app/Dockerfile \
-            -t ${{ secrets.DOCKERHUB_USERNAME }}/test-github-actions-with-renderer:${{ env.DEPLOYMENT_GUID }} \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/test-github-actions-with-renderer:${{ steps.guid.outputs.deployment_guid }} \
             -t ${{ secrets.DOCKERHUB_USERNAME }}/test-github-actions-with-renderer:latest \
             app
 
       # 5️⃣ Push Docker Image
       - name: Push Image
         run: |
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/test-github-actions-with-renderer:${{ env.DEPLOYMENT_GUID }}
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/test-github-actions-with-renderer:${{ steps.guid.outputs.deployment_guid }}
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/test-github-actions-with-renderer:latest
 
   # 6️⃣ Deploy to Render using IMAGE:GUID
