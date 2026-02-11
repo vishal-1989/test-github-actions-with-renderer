@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  docker:
+  docker-build-push:
     runs-on: ubuntu-latest
 
     steps:
@@ -41,7 +41,45 @@ jobs:
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/test-github-actions-with-renderer:${{ env.DEPLOYMENT_GUID }}
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/test-github-actions-with-renderer:latest
 
-      # 6️⃣ Deploy to Render using IMAGE:GUID
+  # 6️⃣ Deploy to Render using IMAGE:GUID
+  #- name: Deploy to Render
+  #  run: |
+  #    curl -X POST \
+  #      "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys" \
+  #      -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+  #      -H "Content-Type: application/json" \
+  #      -d '{
+  #        "clearCache": "do_not_clear",
+  #        "imageUrl": "docker.io/${{ secrets.DOCKERHUB_USERNAME }}/test-github-actions-with-renderer:${{ env.DEPLOYMENT_GUID }}",
+  #        "deployMode": "build_and_deploy"
+  #      }'
+
+  deploy-staging:
+    name: deploy to staging
+    needs: docker-build-push
+    runs-on: ubuntu-latest
+    environment: staging
+
+    steps:
+      - name: Deploy to Render
+        run: |
+          curl -X POST \
+            "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys" \
+            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "clearCache": "do_not_clear",
+              "imageUrl": "docker.io/${{ secrets.DOCKERHUB_USERNAME }}/test-github-actions-with-renderer:${{ env.DEPLOYMENT_GUID }}",
+              "deployMode": "build_and_deploy"
+            }'
+
+  deploy-production:
+    name: deploy to production
+    needs: deploy-staging
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
       - name: Deploy to Render
         run: |
           curl -X POST \
