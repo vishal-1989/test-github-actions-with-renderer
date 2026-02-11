@@ -106,6 +106,8 @@ jobs:
       deployment_guid: ${{ needs.docker-build-push.outputs.deployment_guid }}
 
     steps:
+      - uses: actions/checkout@v4
+
       - name: Install Railway CLI
         run: npm install -g @railway/cli
 
@@ -126,6 +128,8 @@ jobs:
     environment: production
 
     steps:
+      - uses: actions/checkout@v4
+
       - name: Install Railway CLI
         run: npm install -g @railway/cli
 
