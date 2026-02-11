@@ -57,6 +57,46 @@ jobs:
   #        "deployMode": "build_and_deploy"
   #      }'
 
+#  deploy-staging:
+#    name: deploy to staging
+#    needs: docker-build-push
+#    runs-on: ubuntu-latest
+#    environment: staging
+#    outputs:
+#      deployment_guid: ${{ needs.docker-build-push.outputs.deployment_guid }}
+#
+#    steps:
+#      - name: Deploy to Render
+#        run: |
+#          curl -X POST \
+#            "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID_STG }}/deploys" \
+#            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+#            -H "Content-Type: application/json" \
+#            -d '{
+#              "clearCache": "do_not_clear",
+#              "imageUrl": "docker.io/${{ secrets.DOCKERHUB_USERNAME }}/test-github-actions-with-renderer:${{ needs.docker-build-push.outputs.deployment_guid }}",
+#              "deployMode": "build_and_deploy"
+#            }'
+#
+#  deploy-production:
+#    name: deploy to production
+#    needs: deploy-staging
+#    runs-on: ubuntu-latest
+#    environment: production
+#
+#    steps:
+#      - name: Deploy to Render
+#        run: |
+#          curl -X POST \
+#            "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID_PROD }}/deploys" \
+#            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+#            -H "Content-Type: application/json" \
+#            -d '{
+#              "clearCache": "do_not_clear",
+#              "imageUrl": "docker.io/${{ secrets.DOCKERHUB_USERNAME }}/test-github-actions-with-renderer:${{ needs.deploy-staging.outputs.deployment_guid }}",
+#              "deployMode": "build_and_deploy"
+#            }'
+
   deploy-staging:
     name: deploy to staging
     needs: docker-build-push
@@ -66,17 +106,18 @@ jobs:
       deployment_guid: ${{ needs.docker-build-push.outputs.deployment_guid }}
 
     steps:
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
       - name: Deploy to Render
         run: |
-          curl -X POST \
-            "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID_STG }}/deploys" \
-            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
-            -H "Content-Type: application/json" \
-            -d '{
-              "clearCache": "do_not_clear",
-              "imageUrl": "docker.io/${{ secrets.DOCKERHUB_USERNAME }}/test-github-actions-with-renderer:${{ needs.docker-build-push.outputs.deployment_guid }}",
-              "deployMode": "build_and_deploy"
-            }'
+          railway up \
+            --service ${{ secrets.RAILWAY_SERVICE_ID_STAGING }} \
+            --environment staging \
+            --image ${{ secrets.DOCKERHUB_USERNAME }}/test-github-actions-with-renderer:${{ needs.docker-build-push.outputs.deployment_guid }}
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN_STAGING }}
+          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
 
   deploy-production:
     name: deploy to production
@@ -85,14 +126,15 @@ jobs:
     environment: production
 
     steps:
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
       - name: Deploy to Render
         run: |
-          curl -X POST \
-            "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID_PROD }}/deploys" \
-            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
-            -H "Content-Type: application/json" \
-            -d '{
-              "clearCache": "do_not_clear",
-              "imageUrl": "docker.io/${{ secrets.DOCKERHUB_USERNAME }}/test-github-actions-with-renderer:${{ needs.deploy-staging.outputs.deployment_guid }}",
-              "deployMode": "build_and_deploy"
-            }'
+          railway up \
+            --service ${{ secrets.RAILWAY_SERVICE_ID_PRODUCTION }} \
+            --environment production \
+            --image ${{ secrets.DOCKERHUB_USERNAME }}/test-github-actions-with-renderer:${{ needs.deploy-staging.outputs.deployment_guid }}
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN_PRODUCTION }}
+          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
