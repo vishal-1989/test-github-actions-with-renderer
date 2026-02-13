@@ -3,7 +3,7 @@ FROM node:20-alpine
 WORKDIR /app
 
 COPY app/package.json ./
-RUN npm install --production
+RUN npm install
 
 COPY app/. .
 
@@ -13,4 +13,4 @@ ENV DEPLOYMENT_GUID=${DEPLOYMENT_GUID}
 
 EXPOSE 3000
 
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "build"]
