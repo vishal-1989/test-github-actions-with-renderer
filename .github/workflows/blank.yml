@@ -118,7 +118,7 @@ jobs:
             --service ${{ secrets.RAILWAY_SERVICE_ID_STAGING }} \
             --environment staging
         env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN_STAGING }}
           RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
 
       - name: Deploy to Render
@@ -149,6 +149,9 @@ jobs:
             DEPLOYMENT_GUID=${{ needs.deploy-staging.outputs.deployment_guid }} \
             --service ${{ secrets.RAILWAY_SERVICE_ID_PRODUCTION }} \
             --environment production
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN_PRODUCTION }}
+          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
 
       - name: Deploy to Render
         run: |
