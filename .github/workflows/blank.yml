@@ -111,6 +111,16 @@ jobs:
       - name: Install Railway CLI
         run: npm install -g @railway/cli
 
+      - name: Set Railway build arg
+        run: |
+          railway variables set \
+            DEPLOYMENT_GUID=${{ needs.docker-build-push.outputs.deployment_guid }} \
+            --service ${{ secrets.RAILWAY_SERVICE_ID_STAGING }} \
+            --environment staging
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
+
       - name: Deploy to Render
         run: |
           railway up \
@@ -132,6 +142,13 @@ jobs:
 
       - name: Install Railway CLI
         run: npm install -g @railway/cli
+
+      - name: Set Railway build arg
+        run: |
+          railway variables set \
+            DEPLOYMENT_GUID=${{ needs.deploy-staging.outputs.deployment_guid }} \
+            --service ${{ secrets.RAILWAY_SERVICE_ID_PRODUCTION }} \
+            --environment production
 
       - name: Deploy to Render
         run: |
