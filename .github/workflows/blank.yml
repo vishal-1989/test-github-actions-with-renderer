@@ -113,7 +113,7 @@ jobs:
 
       - name: Deploy to Render
         run: |
-          railway up . \
+          railway up \
             --service ${{ secrets.RAILWAY_SERVICE_ID_STAGING }} \
             --environment staging \
             --message "Deploy ${{ needs.docker-build-push.outputs.deployment_guid }}"
@@ -135,7 +135,7 @@ jobs:
 
       - name: Deploy to Render
         run: |
-          railway up app \
+          railway up \
             --service ${{ secrets.RAILWAY_SERVICE_ID_PRODUCTION }} \
             --environment production \
             --message "Deploy ${{ needs.deploy-staging.outputs.deployment_guid }}"
