@@ -13,4 +13,4 @@ ENV DEPLOYMENT_GUID=${DEPLOYMENT_GUID}
 
 EXPOSE 3000
 
-CMD ["npm", "start"]
+CMD ["npm", "run", "dev"]
